@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://rogfassochneycezecxa.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>Confined Space Emergency Info</title>
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #111418; --muted: #4a525c; --line: #d5d9de;
+  --danger: #b3121b; --danger-bg: #fde8e8; --warn: #8a4b00; --warn-bg: #fff3dc; --ok: #1d6b35; --ok-bg: #e5f4ea;
+  --link: #0b57c2; --chip: #eceff2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101317; --card: #1a1f25; --ink: #f2f4f6; --muted: #b4bcc6; --line: #333b45;
+    --danger: #ff6b6b; --danger-bg: #3a1214; --warn: #ffbf5e; --warn-bg: #352409; --ok: #6fd28f; --ok-bg: #11301c;
+    --link: #8ab8ff; --chip: #262d35;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101317; --card: #1a1f25; --ink: #f2f4f6; --muted: #b4bcc6; --line: #333b45;
+  --danger: #ff6b6b; --danger-bg: #3a1214; --warn: #ffbf5e; --warn-bg: #352409; --ok: #6fd28f; --ok-bg: #11301c;
+  --link: #8ab8ff; --chip: #262d35;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; overflow-wrap: anywhere; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 12px 16px 40px; }
+.src { font-size: 13px; color: var(--muted); margin: 2px 0 6px; letter-spacing: .01em; }
+h1 { font-size: 24px; line-height: 1.2; margin: 0 0 10px; }
+h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 700; }
+.hd { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.asof { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.banner { border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; font-weight: 700; font-size: 19px; border: 2px solid transparent; }
+.banner small { display: block; font-weight: 500; font-size: 15px; margin-top: 2px; }
+.b-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+.b-warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+.b-ok { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+.b-info { background: var(--card); color: var(--ink); border-color: var(--line); }
+.fresh { font-size: 15px; color: var(--muted); margin: 0 0 12px; }
+.fresh b { color: var(--ink); }
+.grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } .span2 { grid-column: 1 / -1; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.big { font-size: 22px; font-weight: 700; line-height: 1.25; margin: 2px 0 4px; }
+.huge { font-size: 40px; font-weight: 800; line-height: 1; }
+.row { margin: 8px 0 0; }
+.lab { font-size: 13px; color: var(--muted); font-weight: 600; display: block; }
+.muted { color: var(--muted); }
+a { color: var(--link); }
+a.btn, button.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--chip); color: var(--ink); font: inherit; font-weight: 650; font-size: 16px; text-decoration: none; cursor: pointer; margin: 8px 8px 0 0; }
+ul.people { list-style: none; padding: 0; margin: 8px 0 0; }
+ul.people li { padding: 8px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+ul.people li:first-child { border-top: 0; }
+.gases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+@media (min-width: 520px) { .gases { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.gas { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.gas .v { font-size: 24px; font-weight: 800; }
+.gas .t { font-size: 13px; color: var(--muted); }
+.gas.bad { border: 2px solid var(--danger); background: var(--danger-bg); }
+.gas.bad .v, .flag { color: var(--danger); }
+.flag { font-weight: 800; font-size: 13px; }
+table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 15px; }
+th, td { text-align: left; padding: 6px 6px; border-top: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; border-top: 0; }
+td.bad { color: var(--danger); font-weight: 800; }
+.tscroll { overflow-x: auto; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; padding: 0; list-style: none; }
+.chips li { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); border-radius: 999px; padding: 3px 10px; font-weight: 700; font-size: 15px; }
+.state { text-align: left; }
+.state h1 { margin-top: 6px; }
+.code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: .06em; }
+.foot { font-size: 13px; color: var(--muted); margin-top: 18px; }
+.err { margin: 0 0 12px; }
+[hidden] { display: none !important; }
+@media print {
+  :root, :root[data-theme="dark"] { --bg: #fff; --card: #fff; --ink: #000; --muted: #333; --line: #999; --danger: #000; --danger-bg: #fff; --warn: #000; --warn-bg: #fff; --ok: #000; --ok-bg: #fff; --link: #000; --chip: #fff; }
+  body { font-size: 12pt; }
+  .noprint, a.btn, button.btn { display: none !important; }
+  .card { break-inside: avoid; border-color: #999; }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .banner { border-width: 2px; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #333; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="src">The Pipelayer&rsquo;s Bible &mdash; confined space emergency info</p>
+  <noscript>
+    <div class="banner b-warn">This page needs JavaScript to load the emergency information.
+      <small>Turn JavaScript on for this page, or use the details in the text message and call the crew.</small></div>
+  </noscript>
+  <div id="loading" class="state"><h1>Loading emergency information&hellip;</h1><p class="muted">Getting the latest copy the crew&rsquo;s phone sent.</p></div>
+  <div id="msg" class="state" hidden></div>
+  <div id="err" class="banner b-warn err" hidden role="status"></div>
+  <main id="view" hidden>
+    <div id="banner" class="banner" role="status"></div>
+    <p class="fresh" id="fresh" aria-live="polite"></p>
+    <div id="stale" class="banner b-warn" hidden></div>
+    <div class="grid">
+      <section class="card" id="cLoc"></section>
+      <section class="card" id="cPeople"></section>
+      <section class="card span2" id="cAir"></section>
+      <section class="card" id="cHaz"></section>
+      <section class="card" id="cRescue"></section>
+      <section class="card span2" id="cMore"></section>
+    </div>
+    <p class="noprint"><button type="button" class="btn" id="printBtn">Print / Save as PDF</button></p>
+  </main>
+  <p class="foot" id="foot"></p>
+</div>
+<script>
+'use strict';
+(function () {
+  var URL_BASE = 'https://rogfassochneycezecxa.supabase.co';
+  var KEY = 'sb_publishable_Ge6vIGj2cJ-GL7gNzF9hhw_1jem-aqA'; // the app's public key (safe to publish; the server decides what it may see)
+  var EVERY_MS = 30000;
+  var $ = function (id) { return document.getElementById(id); };
+
+  // The code from the address: /e/<code>, /<code>, ?k=<code> or #<code>
+  function readToken() {
+    var q = '';
+    try { q = new URLSearchParams(location.search).get('k') || ''; } catch (e) {}
+    if (!q && location.hash.length > 1) q = decodeURIComponent(location.hash.slice(1));
+    if (!q) {
+      var segs = location.pathname.split('/').filter(function (s) { return s && !/^(e|index\.html|404\.html)$/i.test(s); });
+      q = segs.length ? decodeURIComponent(segs[segs.length - 1]) : '';
+    }
+    q = String(q).toLowerCase().replace(/[\s._-]/g, '').replace(/o/g, '0').replace(/[il]/g, '1');
+    return /^[0-9abcdefghjkmnpqrstvwxyz]{12,32}$/.test(q) ? q : '';
+  }
+  var token = readToken();
+  var shownCode = token ? token.toUpperCase().replace(/(.{4})(?=.)/g, '$1-') : '';
+
+  var skew = 0;            // server clock minus this computer's clock (ms)
+  var last = null;         // the last good answer
+  var lastCheck = 0, timer = null, missSince = 0, failN = 0;
+
+  function now() { return Date.now() + skew; }
+  function d(v) { var t = v ? new Date(v) : null; return t && !isNaN(t.getTime()) ? t : null; }
+  function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+  function tm(v, secs) {
+    var t = d(v); if (!t) return '';
+    var o = { hour: 'numeric', minute: '2-digit' }; if (secs) o.second = '2-digit';
+    var s = t.toLocaleTimeString([], o);
+    if (!sameDay(t, new Date(now()))) s = t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + s;
+    return s;
+  }
+  function ago(v) {
+    var t = d(v); if (!t) return '';
+    var s = Math.round((now() - t.getTime()) / 1000);
+    if (s < -60) return 'phone clock ahead';
+    if (s < 45) return 'just now';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.floor(m / 60); if (h < 48) return h + ' h ' + (m % 60) + ' min ago';
+    return Math.round(h / 24) + ' days ago';
+  }
+  function zone() { try { var p = new Intl.DateTimeFormat([], { timeZoneName: 'short' }).formatToParts(new Date()); for (var i = 0; i < p.length; i++) if (p[i].type === 'timeZoneName') return p[i].value; } catch (e) {} return ''; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null) e.textContent = String(text); return e; }
+  function add(p) { for (var i = 1; i < arguments.length; i++) if (arguments[i]) p.appendChild(arguments[i]); return p; }
+  function head(card, title, asOf) {
+    card.textContent = '';
+    var h = el('div', 'hd'); add(h, el('h2', '', title), asOf ? el('span', 'asof', 'as of ' + tm(asOf)) : null);
+    card.appendChild(h); return card;
+  }
+  function row(label, value, cls) {
+    if (value === null || value === undefined || value === '') return null;
+    var r = el('div', 'row'); add(r, el('span', 'lab', label), el('div', cls || '', value)); return r;
+  }
+  function link(href, text, cls) { var a = el('a', cls || '', text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+  function num(v) { var n = parseFloat(v); return isFinite(n) && /^\s*-?[\d.]+\s*$/.test(String(v)) ? n : null; }
+  function gasBad(g, v, L) {
+    var n = num(v); if (n === null) return '';
+    if (g === 'o2') { var lo = num(L.o2_min), hi = num(L.o2_max); if (lo !== null && n < lo) return 'LOW'; if (hi !== null && n > hi) return 'HIGH'; return ''; }
+    var mx = num(L[g + '_max']); return mx !== null && n > mx ? 'HIGH' : '';
+  }
+  var GAS = [['o2', 'O₂', '%'], ['lel', 'LEL', '%'], ['h2s', 'H₂S', ' ppm'], ['co', 'CO', ' ppm']];
+
+  function showOnly(which) { ['loading', 'msg', 'view'].forEach(function (id) { $(id).hidden = id !== which; }); }
+  function message(title, lines, cls) {
+    var m = $('msg'); m.textContent = '';
+    add(m, el('div', 'banner ' + (cls || 'b-info'), title));
+    (lines || []).forEach(function (l) { add(m, el('p', 'muted', l)); });
+    showOnly('msg');
+  }
+  function foot() {
+    var f = $('foot'); f.textContent = '';
+    if (shownCode) { add(f, document.createTextNode('Link code '), el('span', 'code', shownCode), document.createTextNode('. ')); }
+    var t = 'Read-only. No sign-in. Times are in this computer’s time zone' + (zone() ? ' (' + zone() + ')' : '') + '.';
+    if (last && last.link_until) t += ' This link stops working ' + tm(last.link_until) + ' (3 days after the permit was closed).';
+    else t += ' This link stops working 3 days after the permit is closed.';
+    f.appendChild(document.createTextNode(t));
+  }
+
+  function render(r) {
+    var p = r.permit || {}, asOf = r.as_of, L = p.limits || {};
+    var incs = p.incidents || [], open = null;
+    for (var i = incs.length - 1; i >= 0; i--) if (incs[i] && incs[i].start && !incs[i].end) { open = incs[i]; break; }
+    var lastInc = incs.length ? incs[incs.length - 1] : null;
+    document.title = (open ? 'EMERGENCY — ' : '') + (p.space || 'Confined space') + ' — emergency info';
+
+    // status banner
+    var b = $('banner'); b.textContent = '';
+    if (open) { b.className = 'banner b-danger'; add(b, document.createTextNode('EMERGENCY DECLARED ' + tm(open.start) + ' (' + ago(open.start) + ')'), el('small', '', 'Not marked resolved on the crew’s phone' + (r.status === 'closed' ? '. The permit was closed ' + tm(r.closed_at) + '.' : '.'))); }
+    else if (r.status === 'closed') { b.className = 'banner b-info'; add(b, document.createTextNode('Permit closed ' + tm(r.closed_at)), el('small', '', (r.closeout_reason ? 'Closeout: ' + r.closeout_reason + '. ' : '') + (lastInc ? 'Emergency declared ' + tm(lastInc.start) + (lastInc.end ? ', ended ' + tm(lastInc.end) + (lastInc.outcome === 'mistake' ? ' (declared by mistake)' : '') : '') + '.' : 'No emergency was declared.'))); }
+    else if (lastInc) { b.className = 'banner b-warn'; add(b, document.createTextNode('Emergency ended ' + tm(lastInc.end) + (lastInc.outcome === 'mistake' ? ' (declared by mistake)' : '')), el('small', '', 'Declared ' + tm(lastInc.start) + '. The permit is still open.')); }
+    else { b.className = 'banner b-ok'; add(b, document.createTextNode('Permit open — no emergency declared'), el('small', '', 'Entry in progress or set up.')); }
+
+    // freshness
+    var fr = $('fresh'); fr.textContent = '';
+    add(fr, document.createTextNode('Last update from the crew’s phone: '), el('b', '', tm(asOf) + ' (' + ago(asOf) + ')'),
+      document.createTextNode('. ' + (r.status === 'open' ? 'The phone sends changes about every 30 s while it has signal; this page checks every 30 s' : 'This page checks every 30 s') + (lastCheck ? ' (last checked ' + tm(lastCheck, true) + ').' : '.')));
+    var st = $('stale'), ageMin = d(asOf) ? (now() - d(asOf).getTime()) / 60000 : 0;
+    st.hidden = !(open && r.status === 'open' && ageMin >= 10);
+    st.textContent = 'Nothing new from the crew’s phone for ' + Math.round(ageMin) + ' min. It may have lost signal, or nothing has changed. Call the crew to confirm.';
+
+    // location
+    var c = head($('cLoc'), 'Location', asOf);
+    add(c, el('div', 'big', p.address || 'No site address entered'));
+    if (p.address) c.appendChild(link('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.address), 'Open address in maps', 'btn'));
+    var g = (p.gps || [])[0];
+    if (g) {
+      var gr = el('div', 'row'); add(gr, el('span', 'lab', 'Phone GPS (read when EMERGENCY was tapped)'),
+        el('div', '', g.lat.toFixed(5) + ', ' + g.lon.toFixed(5) + (typeof g.acc === 'number' ? ' ± ' + g.acc + ' m' : '') + ' at ' + tm(g.t) + ' (' + ago(g.t) + ')'));
+      if (typeof g.acc === 'number' && g.acc > 100) gr.appendChild(el('div', 'flag', 'Rough fix: accuracy worse than 100 m'));
+      gr.appendChild(link('https://www.google.com/maps/search/?api=1&query=' + g.lat.toFixed(5) + '%2C' + g.lon.toFixed(5), 'Open GPS point in maps', 'btn'));
+      c.appendChild(gr);
+    } else add(c, row('Phone GPS', 'None sent (the phone sends its position only after EMERGENCY is tapped).', 'muted'));
+    add(c, row('Entrance / landmarks', p.landmarks), row('Space', p.space), row('Jobsite', [p.jobsite, p.job_number ? 'Job #' + p.job_number : ''].filter(Boolean).join(' · ')), row('Contractor', r.company));
+
+    // people
+    c = head($('cPeople'), 'Who is inside', asOf);
+    var n = p.inside_count || 0;
+    add(c, el('div', 'huge', String(n)), el('div', 'muted', n === 1 ? 'person checked in on the permit' : 'people checked in on the permit'));
+    var ul = el('ul', 'people');
+    (p.inside || []).forEach(function (x) { var li = el('li'); add(li, el('span', '', x.name + (x.role && x.role !== 'Entrant' ? ' (' + x.role + ')' : '')), el('span', 'muted', x.since ? 'in since ' + tm(x.since) : '')); ul.appendChild(li); });
+    if (n) c.appendChild(ul);
+    if (!n && (open || r.status === 'open')) c.appendChild(el('p', 'muted', 'Nobody is checked in on the app. Confirm with the attendant: someone may have entered without being logged.'));
+    add(c, row('Entry supervisor', p.supervisor), row('Attendant (outside)', p.attendant));
+
+    // air
+    c = head($('cAir'), 'Air readings', asOf);
+    var rows = p.air || [];
+    var gw = el('div', 'gases');
+    GAS.forEach(function (gd) {
+      var hit = null; for (var j = 0; j < rows.length; j++) if (rows[j][gd[0]] !== null && rows[j][gd[0]] !== undefined && rows[j][gd[0]] !== '') { hit = rows[j]; break; }
+      var bad = hit ? gasBad(gd[0], hit[gd[0]], L) : '';
+      var box = el('div', 'gas' + (bad ? ' bad' : ''));
+      add(box, el('div', 'lab', gd[1] + ' (latest)'), el('div', 'v', hit ? hit[gd[0]] + gd[2] : '—'), bad ? el('div', 'flag', bad + ' — outside the permit limit') : null, el('div', 't', hit ? 'tested ' + tm(hit.t) + ' (' + ago(hit.t) + ')' : 'not tested'));
+      gw.appendChild(box);
+    });
+    c.appendChild(gw);
+    if (p.air_seen) c.appendChild(el('p', 'flag', 'Last reading seen on the monitor but not logged: ' + (p.air_seen.text || GAS.map(function (gd) { return p.air_seen[gd[0]] ? gd[1] + ' ' + p.air_seen[gd[0]] + gd[2] : ''; }).filter(Boolean).join(', ') + ' at ' + tm(p.air_seen.t))));
+    var lim = [L.o2_min || L.o2_max ? 'O₂ ' + (L.o2_min || '?') + '–' + (L.o2_max || '?') + '%' : '', L.lel_max ? 'LEL max ' + L.lel_max + '%' : '', L.h2s_max ? 'H₂S max ' + L.h2s_max + ' ppm' : '', L.co_max ? 'CO max ' + L.co_max + ' ppm' : ''].filter(Boolean).join(' · ');
+    if (lim) c.appendChild(row('Permit limits', lim, 'muted'));
+    if (rows.length) {
+      var tw = el('div', 'tscroll'), tb = el('table'), tr = el('tr');
+      ['Time'].concat(GAS.map(function (x) { return x[1]; })).forEach(function (h) { tr.appendChild(el('th', '', h)); });
+      tb.appendChild(tr);
+      rows.forEach(function (x) { var t2 = el('tr'); t2.appendChild(el('td', '', tm(x.t))); GAS.forEach(function (gd) { var v = x[gd[0]]; t2.appendChild(el('td', gasBad(gd[0], v, L) ? 'bad' : '', v === null || v === undefined || v === '' ? '—' : v)); }); tb.appendChild(t2); });
+      tw.appendChild(tb); add(c, el('span', 'lab', 'Recent tests, newest first'), tw);
+    } else c.appendChild(el('p', 'muted', 'No air test logged yet.'));
+
+    // hazards
+    c = head($('cHaz'), 'Hazards', asOf);
+    if ((p.hazards || []).length) { var ch = el('ul', 'chips'); p.hazards.forEach(function (h) { ch.appendChild(el('li', '', h)); }); c.appendChild(ch); }
+    add(c, row('Hazards noted', p.hazards_text), row('Isolation / controls', p.controls), row('If ventilation fails', p.vent_fail));
+    if (!(p.hazards || []).length && !p.hazards_text) c.appendChild(el('p', 'muted', 'No hazards entered on the permit.'));
+
+    // rescue
+    c = head($('cRescue'), 'Rescue and contact', asOf);
+    if (p.emergency_number) { var er = el('div', 'row'); add(er, el('span', 'lab', 'Emergency / rescue number on the permit'), el('div', 'big', p.emergency_number)); er.appendChild((function () { var a = el('a', 'btn noprint', 'Call ' + p.emergency_number); a.href = 'tel:' + String(p.emergency_number).replace(/[^\d+]/g, ''); return a; })()); c.appendChild(er); }
+    add(c, row('Rescue plan', p.rescue), row('Communication', p.comms));
+    if (!p.emergency_number && !p.rescue) c.appendChild(el('p', 'muted', 'No rescue information entered.'));
+
+    // more
+    c = head($('cMore'), 'Permit', asOf);
+    add(c, row('Purpose of entry', p.purpose), row('Permit opened', r.opened_at ? tm(r.opened_at) : null), row('Permit closed', r.closed_at ? tm(r.closed_at) : null),
+      row('Emergencies declared', incs.length ? incs.map(function (x) { return tm(x.start) + (x.end ? ' → ended ' + tm(x.end) + (x.outcome === 'mistake' ? ' (by mistake)' : '') : ' → not resolved'); }).join('; ') : 'None'),
+      row('People on the roster', String(p.roster_count || 0)));
+    showOnly('view');
+  }
+
+  function schedule(ms) { clearTimeout(timer); timer = setTimeout(load, ms); }
+  function showErr(text) { var e = $('err'); e.textContent = text; e.hidden = !text; }
+
+  function load() {
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var to = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
+    var sent = Date.now();
+    fetch(URL_BASE + '/rest/v1/rpc/pb_em_view', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': KEY }, body: JSON.stringify({ p_token: token }),
+      credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer', signal: ctl ? ctl.signal : undefined
+    }).then(function (res) {
+      return res.json().catch(function () { return null; }).then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
+    }).then(function (x) {
+      clearTimeout(to);
+      if (!x.ok || !x.body || typeof x.body !== 'object') throw new Error(x.status === 404 ? 'notinstalled' : 'http');
+      var r = x.body, sn = d(r.server_now);
+      if (sn) skew = sn.getTime() - Math.round((sent + Date.now()) / 2);
+      lastCheck = now(); failN = 0; showErr('');
+      if (r.status === 'open' || r.status === 'closed') { last = r; missSince = 0; render(r); foot(); schedule(EVERY_MS); return; }
+      if (r.status === 'busy') { showErr('The server asked this page to slow down. Checking again in ' + (r.retry_s || 30) + ' s.'); schedule(Math.max(10, r.retry_s || 30) * 1000); return; }
+      if (r.status === 'expired') {
+        last = null; clearTimeout(timer);
+        message('This link has expired', [r.why === 'ended' ? 'The crew stopped sharing this permit.' : r.why === 'closed' ? 'The permit was closed more than 3 days ago' + (r.closed_at ? ' (' + tm(r.closed_at) + ')' : '') + ', so its emergency information is no longer shared.' : 'Its emergency information is no longer shared.', 'Contact the contractor for the permit record.'], 'b-info');
+        foot(); return;
+      }
+      // not_found: maybe the crew's phone has had no data yet; keep checking
+      if (!missSince) missSince = Date.now();
+      if (last) { showErr('The server no longer finds this link (checked ' + tm(lastCheck, true) + '). Showing what was last received.'); schedule(EVERY_MS); return; }
+      message('No information for this link yet', [
+        'The crew’s phone may not have been able to send the permit yet (no data signal) — this page checks again every 30 seconds' + (missSince ? ' (last checked ' + tm(lastCheck, true) + ')' : '') + '.',
+        'Or the link was typed wrong: check the code against the text message' + (shownCode ? ' (this page read ' + shownCode + ')' : '') + '.',
+        'Use the address and details in the text message, and call the crew.'], 'b-warn');
+      foot(); schedule(Date.now() - missSince > 30 * 60000 ? 120000 : EVERY_MS);
+    }).catch(function (e) {
+      clearTimeout(to); failN++;
+      var wait = Math.min(60000, 10000 * failN);
+      var why = String(e && e.message) === 'notinstalled' ? 'This page isn’t connected to its server yet.' : 'Couldn’t reach the server' + (navigator.onLine === false ? ' (this computer is offline)' : '') + '.';
+      if (last) { showErr(why + ' Showing what was received ' + tm(lastCheck, true) + '. Trying again in ' + Math.round(wait / 1000) + ' s.'); render(last); }
+      else message('Couldn’t load the emergency information', [why + ' Trying again in ' + Math.round(wait / 1000) + ' s.', 'Meanwhile use the address and details in the text message, and call the crew.'], 'b-warn');
+      foot(); schedule(wait);
+    });
+  }
+
+  $('printBtn').addEventListener('click', function () { try { window.print(); } catch (e) {} });
+  // a tab that comes back to the front checks at once; minute-old times are refreshed in between
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && token && (!last || Date.now() - (lastCheck - skew) > 15000)) schedule(0); });
+  setInterval(function () { if (last && !$('view').hidden) render(last); }, 20000);
+
+  if (!token) {
+    message('This link is incomplete', ['The address should end with a 12-character code, like e.pipelayersbible.com/7K3M9Q2XHW4P. Check it against the text message.'], 'b-warn');
+    foot();
+  } else load();
+})();
+</script>
+</body>
+</html>
