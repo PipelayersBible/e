@@ -122,10 +122,12 @@ td.bad { color: var(--danger); font-weight: 800; }
   var EVERY_MS = 30000;
   var $ = function (id) { return document.getElementById(id); };
 
-  // The code from the address: /e/<code>, /<code>, ?k=<code> or #<code>
+  // The code from the address. The app sends e.pipelayersbible.com/?<code> (GitHub Pages serves index.html with 200).
+  // Also read: ?k=<code>, #<code>, /<code> and /e/<code> (those come through 404.html).
   function readToken() {
     var q = '';
     try { q = new URLSearchParams(location.search).get('k') || ''; } catch (e) {}
+    if (!q && location.search.length > 1 && location.search.indexOf('=') < 0) { try { q = decodeURIComponent(location.search.slice(1)); } catch (e) { q = location.search.slice(1); } }
     if (!q && location.hash.length > 1) q = decodeURIComponent(location.hash.slice(1));
     if (!q) {
       var segs = location.pathname.split('/').filter(function (s) { return s && !/^(e|index\.html|404\.html)$/i.test(s); });
@@ -192,8 +194,9 @@ td.bad { color: var(--danger); font-weight: 800; }
     var f = $('foot'); f.textContent = '';
     if (shownCode) { add(f, document.createTextNode('Link code '), el('span', 'code', shownCode), document.createTextNode('. ')); }
     var t = 'Read-only. No sign-in. Times are in this computer’s time zone' + (zone() ? ' (' + zone() + ')' : '') + '.';
-    if (last && last.link_until) t += ' This link stops working ' + tm(last.link_until) + ' (3 days after the permit was closed).';
-    else t += ' This link stops working 3 days after the permit is closed.';
+    if (last && last.link_until) t += ' This link stops working ' + tm(last.link_until) + ' (3 days after the permit was closed or its last emergency ended, whichever was later).';
+    else if (last && last.status === 'closed') t += ' An emergency on this permit is not marked over, so this link keeps working' + (last.link_max ? ' until ' + tm(last.link_max) + ' at the latest' : '') + '.';
+    else t += ' This link stops working 3 days after the permit is closed (or after its last emergency ends, if later).';
     f.appendChild(document.createTextNode(t));
   }
 
@@ -208,15 +211,16 @@ td.bad { color: var(--danger); font-weight: 800; }
     var b = $('banner'); b.textContent = '';
     if (open) { b.className = 'banner b-danger'; add(b, document.createTextNode('EMERGENCY DECLARED ' + tm(open.start) + ' (' + ago(open.start) + ')'), el('small', '', 'Not marked resolved on the crew’s phone' + (r.status === 'closed' ? '. The permit was closed ' + tm(r.closed_at) + '.' : '.'))); }
     else if (r.status === 'closed') { b.className = 'banner b-info'; add(b, document.createTextNode('Permit closed ' + tm(r.closed_at)), el('small', '', (r.closeout_reason ? 'Closeout: ' + r.closeout_reason + '. ' : '') + (lastInc ? 'Emergency declared ' + tm(lastInc.start) + (lastInc.end ? ', ended ' + tm(lastInc.end) + (lastInc.outcome === 'mistake' ? ' (declared by mistake)' : '') : '') + '.' : 'No emergency was declared.'))); }
-    else if (lastInc) { b.className = 'banner b-warn'; add(b, document.createTextNode('Emergency ended ' + tm(lastInc.end) + (lastInc.outcome === 'mistake' ? ' (declared by mistake)' : '')), el('small', '', 'Declared ' + tm(lastInc.start) + '. The permit is still open.')); }
-    else { b.className = 'banner b-ok'; add(b, document.createTextNode('Permit open — no emergency declared'), el('small', '', 'Entry in progress or set up.')); }
+    // An OPEN permit is never shown as safe: an emergency may have been declared that has not reached this page yet.
+    else if (lastInc) { b.className = 'banner b-warn'; add(b, document.createTextNode('Last emergency ended ' + tm(lastInc.end) + (lastInc.outcome === 'mistake' ? ' (declared by mistake)' : '')), el('small', '', 'Declared ' + tm(lastInc.start) + '. No newer emergency had reached this page as of ' + tm(asOf) + '. The crew’s phone may not have sent it yet. If a text sent you here, treat it as an emergency.')); }
+    else { b.className = 'banner b-info'; add(b, document.createTextNode('No emergency had reached this page as of ' + tm(asOf) + '.'), el('small', '', 'The crew’s phone may not have sent it yet. If a text sent you here, treat it as an emergency.')); }
 
     // freshness
     var fr = $('fresh'); fr.textContent = '';
     add(fr, document.createTextNode('Last update from the crew’s phone: '), el('b', '', tm(asOf) + ' (' + ago(asOf) + ')'),
       document.createTextNode('. ' + (r.status === 'open' ? 'The phone sends changes about every 30 s while it has signal; this page checks every 30 s' : 'This page checks every 30 s') + (lastCheck ? ' (last checked ' + tm(lastCheck, true) + ').' : '.')));
     var st = $('stale'), ageMin = d(asOf) ? (now() - d(asOf).getTime()) / 60000 : 0;
-    st.hidden = !(open && r.status === 'open' && ageMin >= 10);
+    st.hidden = !(r.status === 'open' && ageMin >= 10); // by the age of the last update, whatever it says about an emergency
     st.textContent = 'Nothing new from the crew’s phone for ' + Math.round(ageMin) + ' min. It may have lost signal, or nothing has changed. Call the crew to confirm.';
 
     // location
@@ -305,6 +309,11 @@ td.bad { color: var(--danger); font-weight: 800; }
       if (sn) skew = sn.getTime() - Math.round((sent + Date.now()) / 2);
       lastCheck = now(); failN = 0; showErr('');
       if (r.status === 'open' || r.status === 'closed') { last = r; missSince = 0; render(r); foot(); schedule(EVERY_MS); return; }
+      if (r.status === 'conflict') {
+        last = null; clearTimeout(timer);
+        message('This link can’t be shown — call the crew', ['The server can’t tell which permit this link belongs to, so it shows nothing rather than the wrong site.', 'Use the address and details in the text message, and call the crew.'], 'b-warn');
+        foot(); return;
+      }
       if (r.status === 'busy') { showErr('The server asked this page to slow down. Checking again in ' + (r.retry_s || 30) + ' s.'); schedule(Math.max(10, r.retry_s || 30) * 1000); return; }
       if (r.status === 'expired') {
         last = null; clearTimeout(timer);
@@ -335,7 +344,7 @@ td.bad { color: var(--danger); font-weight: 800; }
   setInterval(function () { if (last && !$('view').hidden) render(last); }, 20000);
 
   if (!token) {
-    message('This link is incomplete', ['The address should end with a 12-character code, like e.pipelayersbible.com/7K3M9Q2XHW4P. Check it against the text message.'], 'b-warn');
+    message('This link is incomplete', ['The address should end with a 12-character code, like e.pipelayersbible.com/?7K3M9Q2XHW4P. Check it against the text message.'], 'b-warn');
     foot();
   } else load();
 })();
